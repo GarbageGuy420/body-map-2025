@@ -81,6 +81,18 @@
                     window.parent.location.href = basic_config[id]['url'];
                 }
             })
+            function addEvent(id, relationId) {
+    var _obj = $('#' + id);
+    $('#basic-wrapper').css({'opacity': '1'});
+
+    if (basic_config[id]['active'] === true) {
+        _obj.on('mouseup', function () {
+            var selectedPart = basic_config[id]['hover']; // Get selected body part
+            window.parent.postMessage({ bodyPart: selectedPart }, '*'); // Send to JotForm
+        });
+    }
+}
+
             _obj.on('mousemove', function (e) {
                 let x = e.pageX + 10, y = e.pageY + 15;
 
