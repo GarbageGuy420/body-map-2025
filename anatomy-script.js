@@ -60,7 +60,18 @@
                 });
             }
             _obj.attr({'cursor': 'pointer'});
+            if (basic_config[id]['active'] === true) {
+            _obj.on('click', function () {
+                if (selectedObject) {
+                    selectedObject.css({'fill': 'rgba(255, 0, 0, 0)'}); // Reset previous selection
+                }
 
+                selectedObject = _obj;
+                _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'}); // Highlight selection
+                
+                // Optional: Store selection in a hidden field for form submission
+                $("#selectedPart").val(id);
+            });
             _obj.on('mouseenter', function () {
                 $('#tip-basic').show().html(basic_config[id]['hover']);
                 _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'})
