@@ -98,4 +98,42 @@
             _obj.hide();
         }
     }
+    var selectedPart = null; // Stores the last selected part
+
+function addEvent(id) {
+    var _obj = $('#' + id);
+    $('#basic-wrapper').css({'opacity': '1'});
+
+    _obj.attr({'fill': 'rgba(255, 0, 0, 0)', 'stroke': 'rgba(255, 102, 102, 1)'});
+    _obj.attr({'cursor': 'default'});
+
+    if (basic_config[id]['active'] === true) {
+        _obj.attr({'cursor': 'pointer'});
+
+        _obj.on('mouseenter', function () {
+            if (selectedPart !== id) {
+                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'});
+            }
+            $('#tip-basic').show().html(basic_config[id]['hover']);
+        }).on('mouseleave', function () {
+            if (selectedPart !== id) {
+                _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
+            }
+            $('#tip-basic').hide();
+        });
+
+        _obj.on('click', function () {
+            // Remove previous selection highlight
+            if (selectedPart) {
+                $('#' + selectedPart).css({'fill': 'rgba(255, 0, 0, 0)'});
+            }
+
+            // Set new selection
+            selectedPart = id;
+            _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'}); // Persistent highlight
+        });
+    } else {
+        _obj.hide();
+    }
+}
 })(jQuery);
