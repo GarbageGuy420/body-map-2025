@@ -3,18 +3,34 @@
     "use strict";
 
     function isTouchEnabled() {
-    return (('ontouchstart' in window)
-        || (navigator.MaxTouchPoints > 0)
-        || (navigator.msMaxTouchPoints > 0));
+        return (('ontouchstart' in window)
+            || (navigator.MaxTouchPoints > 0)
+            || (navigator.msMaxTouchPoints > 0));
     }
+
+    var selectedPart = null; // Stores the last selected part
 
     $(document).ready(function () {
         $("path[id^=\"basic_\"]").each(function (i, e) {
             addEvent($(e).attr('id'));
         });
+
+        // Click outside the anatomy model to deselect
+        $(document).on('click touchstart', function () {
+            if (selectedPart) {
+                $('#' + selectedPart).css({'fill': 'rgba(255, 0, 0, 0)'}); // Remove highlight
+                selectedPart = null;
+                $('#tip-basic').hide(); // Hide tooltip
+            }
+        });
+
+        // Prevent deselection when clicking inside the anatomy model
+        $('#basic-wrapper').on('click touchstart', function (e) {
+            e.stopPropagation();
+        });
     });
 
-    function addEvent(id, relationId) {
+    function addEvent(id) {
         var _obj = $('#' + id);
         $('#basic-wrapper').css({'opacity': '1'});
 
@@ -22,118 +38,47 @@
         _obj.attr({'cursor': 'default'});
 
         if (basic_config[id]['active'] === true) {
-            if (isTouchEnabled()) {
-                var touchmoved;
-                _obj.on('touchend', function (e) {
-                    if (touchmoved !== true) {
-                        _obj.on('touchstart', function (e) {
-                            let touch = e.originalEvent.touches[0];
-                            let x = touch.pageX - 10, y = touch.pageY + (-15);
-
-                            let $basicatip = $('#tip-basic');
-                            let basicanatomytipw = $basicatip.outerWidth(),
-                                basicanatomytiph = $basicatip.outerHeight();
-
-                            x = (x + basicanatomytipw > $(document).scrollLeft() + $(window).width()) ? x - basicanatomytipw - (20 * 2) : x
-                            y = (y + basicanatomytiph > $(document).scrollTop() + $(window).height()) ? $(document).scrollTop() + $(window).height() - basicanatomytiph - 10 : y
-
-                            if (basic_config[id]['target'] !== 'none') {
-                                _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'});
-                            }
-                            $basicatip.show().html(basic_config[id]['hover']);
-                            $basicatip.css({left: x, top: y})
-                        })
-                        _obj.on('touchend', function () {
-                            _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
-                            if (basic_config[id]['target'] === '_blank') {
-                                window.open(basic_config[id]['url']);
-                            } else if (basic_config[id]['target'] === '_self') {
-                                window.parent.location.href = basic_config[id]['url'];
-                            }
-                            $('#tip-basic').hide();
-                        })
-                    }
-                }).on('touchmove', function (e) {
-                    touchmoved = true;
-                }).on('touchstart', function () {
-                    touchmoved = false;
-                });
-            }
             _obj.attr({'cursor': 'pointer'});
 
             _obj.on('mouseenter', function () {
-                $('#tip-basic').show().html(basic_config[id]['hover']);
-                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'})
-            }).on('mouseleave', function () {
-                $('#tip-basic').hide();
-                _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
-            })
-            if (basic_config[id]['target'] !== 'none') {
-                _obj.on('mousedown', function () {
-                    _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'});
-                })
-            }
-            _obj.on('mouseup', function () {
-                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'});
-                if (basic_config[id]['target'] === '_blank') {
-                    window.open(basic_config[id]['url']);
-                } else if (basic_config[id]['target'] === '_self') {
-                    window.parent.location.href = basic_config[id]['url'];
+                if (selectedPart !== id) {
+                    _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'});
                 }
-            })
-            _obj.on('mousemove', function (e) {
-                let x = e.pageX + 10, y = e.pageY + 15;
+                $('#tip-basic').show().html(basic_config[id]['hover']);
+            }).on('mouseleave', function () {
+                if (selectedPart !== id) {
+                    _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
+                }
+                if (!selectedPart) {
+                    $('#tip-basic').hide();
+                }
+            });
 
-                let $abasic = $('#tip-basic');
-                let basicanatomytipw = $abasic.outerWidth(), basicanatomytiph = $abasic.outerHeight();
+            // Temporary highlight on touchstart/mousedown
+            _obj.on('mousedown touchstart', function (e) {
+                _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'}); // Temporary highlight
+                e.stopPropagation(); // Prevent deselection
+            });
 
-                x = (x + basicanatomytipw > $(document).scrollLeft() +
-                    $(window).width()) ? x - basicanatomytipw - (20 * 2) : x
-                y = (y + basicanatomytiph > $(document).scrollTop() + $(window).height()) ?
-                    $(document).scrollTop() + $(window).height() - basicanatomytiph - 10 : y
+            // Persistent highlight on selection (mouseup/touchend)
+            _obj.on('mouseup touchend', function (e) {
+                // Reset previous selection
+                if (selectedPart) {
+                    $('#' + selectedPart).css({'fill': 'rgba(255, 0, 0, 0)'});
+                }
 
-                $abasic.css({left: x, top: y})
-            })
+                // Set new selection
+                selectedPart = id;
+                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'}); // Persistent highlight
+
+                // Keep tooltip visible and update content
+                $('#tip-basic').show().html(basic_config[id]['hover']);
+
+                e.stopPropagation(); // Prevent deselection
+            });
         } else {
             _obj.hide();
         }
     }
-    var selectedPart = null; // Stores the last selected part
 
-function addEvent(id) {
-    var _obj = $('#' + id);
-    $('#basic-wrapper').css({'opacity': '1'});
-
-    _obj.attr({'fill': 'rgba(255, 0, 0, 0)', 'stroke': 'rgba(255, 102, 102, 1)'});
-    _obj.attr({'cursor': 'default'});
-
-    if (basic_config[id]['active'] === true) {
-        _obj.attr({'cursor': 'pointer'});
-
-        _obj.on('mouseenter', function () {
-            if (selectedPart !== id) {
-                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'});
-            }
-            $('#tip-basic').show().html(basic_config[id]['hover']);
-        }).on('mouseleave', function () {
-            if (selectedPart !== id) {
-                _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
-            }
-            $('#tip-basic').hide();
-        });
-
-        _obj.on('click', function () {
-            // Remove previous selection highlight
-            if (selectedPart) {
-                $('#' + selectedPart).css({'fill': 'rgba(255, 0, 0, 0)'});
-            }
-
-            // Set new selection
-            selectedPart = id;
-            _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'}); // Persistent highlight
-        });
-    } else {
-        _obj.hide();
-    }
-}
 })(jQuery);
