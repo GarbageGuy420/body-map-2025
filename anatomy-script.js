@@ -64,6 +64,19 @@
 
                 $tip.show().html(basic_config[id]['hover']).css({ left: x, top: y });
             });
+
+            _obj.on('mousemove', function (e) {
+                if (!selectedObject || selectedObject !== _obj) {
+                    let x = e.pageX + 10, y = e.pageY - 15;
+                    let $tip = $('#tip-basic');
+                    let tipWidth = $tip.outerWidth(), tipHeight = $tip.outerHeight();
+
+                    x = (x + tipWidth > $(document).scrollLeft() + $(window).width()) ? x - tipWidth - 20 : x;
+                    y = (y + tipHeight > $(document).scrollTop() + $(window).height()) ? $(document).scrollTop() + $(window).height() - tipHeight - 10 : y;
+
+                    $tip.css({ left: x, top: y });
+                }
+            });
         } else {
             _obj.hide();
         }
