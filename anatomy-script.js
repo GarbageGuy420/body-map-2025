@@ -50,8 +50,7 @@
                             } else if (basic_config[id]['target'] === '_self') {
                                 window.parent.location.href = basic_config[id]['url'];
                             }
-                            $('#tip-basic').hide();
-                        })
+                                                })
                     }
                 }).on('touchmove', function (e) {
                     touchmoved = true;
@@ -94,8 +93,6 @@
 
                 $abasic.css({left: x, top: y})
             })
-        } else {
-            _obj.hide();
         }
     }
 })(jQuery);
