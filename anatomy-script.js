@@ -3,9 +3,9 @@
     "use strict";
 
     function isTouchEnabled() {
-    return (('ontouchstart' in window)
-        || (navigator.MaxTouchPoints > 0)
-        || (navigator.msMaxTouchPoints > 0));
+        return (('ontouchstart' in window)
+            || (navigator.MaxTouchPoints > 0)
+            || (navigator.msMaxTouchPoints > 0));
     }
 
     $(document).ready(function () {
@@ -34,15 +34,15 @@
                             let basicanatomytipw = $basicatip.outerWidth(),
                                 basicanatomytiph = $basicatip.outerHeight();
 
-                            x = (x + basicanatomytipw > $(document).scrollLeft() + $(window).width()) ? x - basicanatomytipw - (20 * 2) : x
-                            y = (y + basicanatomytiph > $(document).scrollTop() + $(window).height()) ? $(document).scrollTop() + $(window).height() - basicanatomytiph - 10 : y
+                            x = (x + basicanatomytipw > $(document).scrollLeft() + $(window).width()) ? x - basicanatomytipw - (20 * 2) : x;
+                            y = (y + basicanatomytiph > $(document).scrollTop() + $(window).height()) ? $(document).scrollTop() + $(window).height() - basicanatomytiph - 10 : y;
 
                             if (basic_config[id]['target'] !== 'none') {
                                 _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'});
                             }
                             $basicatip.show().html(basic_config[id]['hover']);
-                            $basicatip.css({left: x, top: y})
-                        })
+                            $basicatip.css({left: x, top: y});
+                        });
                         _obj.on('touchend', function () {
                             _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
                             if (basic_config[id]['target'] === '_blank') {
@@ -51,7 +51,7 @@
                                 window.parent.location.href = basic_config[id]['url'];
                             }
                             $('#tip-basic').hide();
-                        })
+                        });
                     }
                 }).on('touchmove', function (e) {
                     touchmoved = true;
@@ -63,16 +63,18 @@
 
             _obj.on('mouseenter', function () {
                 $('#tip-basic').show().html(basic_config[id]['hover']);
-                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'})
+                _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'});
             }).on('mouseleave', function () {
                 $('#tip-basic').hide();
                 _obj.css({'fill': 'rgba(255, 0, 0, 0)'});
-            })
+            });
+
             if (basic_config[id]['target'] !== 'none') {
                 _obj.on('mousedown', function () {
                     _obj.css({'fill': 'rgba(255, 0, 0, 0.7)'});
-                })
+                });
             }
+
             _obj.on('mouseup', function () {
                 _obj.css({'fill': 'rgba(255, 0, 0, 0.3)'});
                 if (basic_config[id]['target'] === '_blank') {
@@ -80,18 +82,11 @@
                 } else if (basic_config[id]['target'] === '_self') {
                     window.parent.location.href = basic_config[id]['url'];
                 }
-            })
-            function addEvent(id, relationId) {
-    var _obj = $('#' + id);
-    $('#basic-wrapper').css({'opacity': '1'});
 
-    if (basic_config[id]['active'] === true) {
-        _obj.on('mouseup', function () {
-            var selectedPart = basic_config[id]['hover']; // Get selected body part
-            window.parent.postMessage({ bodyPart: selectedPart }, '*'); // Send to JotForm
-        });
-    }
-}
+                // ✅ Send selected body part to JotForm
+                var selectedPart = basic_config[id]['hover']; // Get selected body part
+                window.parent.postMessage({ bodyPart: selectedPart }, '*'); // Send to JotForm
+            });
 
             _obj.on('mousemove', function (e) {
                 let x = e.pageX + 10, y = e.pageY + 15;
@@ -100,12 +95,12 @@
                 let basicanatomytipw = $abasic.outerWidth(), basicanatomytiph = $abasic.outerHeight();
 
                 x = (x + basicanatomytipw > $(document).scrollLeft() +
-                    $(window).width()) ? x - basicanatomytipw - (20 * 2) : x
+                    $(window).width()) ? x - basicanatomytipw - (20 * 2) : x;
                 y = (y + basicanatomytiph > $(document).scrollTop() + $(window).height()) ?
-                    $(document).scrollTop() + $(window).height() - basicanatomytiph - 10 : y
+                    $(document).scrollTop() + $(window).height() - basicanatomytiph - 10 : y;
 
-                $abasic.css({left: x, top: y})
-            })
+                $abasic.css({left: x, top: y});
+            });
         } else {
             _obj.hide();
         }
